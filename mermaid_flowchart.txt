@@ -1,0 +1,46 @@
+https://mermaid.ink/svg/pako:eNptVd9v0zAQ_ldOfgKpm1iXjrYPSFMHE2IItAIPJHtwk2tjltjBP1rGuv-ds50m6Uak1ufL-fP5u--cR5arAtmcrSu1y0uuLXy7ymQmwbjVRvOmhEUlUNqlKDCNJnj7jkLoiZ4fAnfpd4MaCMKCkBY1z61Q0oehLACOMT-5FWqJFs2icoai094DreuwAyGulE3bEWiXrcgP-99iIUwa_mHB89L745turytu-TW3JWohN-lCK_lLrUA7aUDJHIHDDvG-xfPPB6Ex13xXpUsaGigIAJyh1f2rQfiidPLeQ39FvVa6jvF56x0Evq9XWBQ-8pvm0oTYEGY8YwoKlbva84uHwHZxS2DHY3e0m5vPl41IaYDlES3kaR3plwbl5ce7sPy4CF-FxFxJTA9GWPwDc6v0kn6YRhvC5KiSPQZqI6haROQNf6A6Xiu1qZBqqFwR6Fpxc8jKV8JP01f-hfGone_13eCAvarg5OTdQQLkbzXgnfsbpe6BSITfjrBIa5B7ARRU1SiLfRwyGeURFt2idVoCqQGoBDtS7FqrOgaCWBOeoySEBZ9TgOrQjahFxbWwD_s-owH0xzVVECSlV_ItxmSgaTXBSbdc5-URyoDqTA4mHR5fqa0XqC2JrlJVBeg-_20sjrAGq_Ugpf8BrZDaewBjPNXdyXhl1QZ9h8BO2BKsauBTJ0fjN9UCt8QHN0BCsfjHUpBX2X4gtUz29gu2by-vW8YHqT6Pj0l7OTvDNwg1Wh66iVO6rrtfSuG1QwQexPMS6XtD6zDsHArRaSGTXQ-32op96sUVreDuejWTndkiG7qiYlP1jQo13aKV5yQe2BMUejoWyRzT9ByxqRQvQq4doAlYfZVDszxTzFE3vBD2fnA3Z5KNWI265qKgu_7Rt2PGKLbGjM3JLHDNXWUzlsknCuXOquWDzNncaocjppXblGy-5pWhmQvcXglOV0DdeRsufyp1NGfzR_aHzcfn56fT2dtkMp6czd7MzpJkxB7Y_CQ5nUwmyTQZzy4mCXmTpxH7GyDOTt9cTMbJbHIxHl-cJ9PpdMSofHTsz_FrFT5aT_8AqrtdiQ
+
+flowchart TD
+
+ subgraph ClientSide[Client Side]
+    ClientView[User chat interaction]
+ end  
+
+ subgraph KubernetesCluster[Kubernetes Cluster]
+    Chatbot[Chatbot service]
+    Redis[Redis Cache]
+
+    subgraph DataGathering[Cronjob runs once a week]
+        Firecrawl[Scrap data using Firecrawl]
+        Chunking[Perform data chunking]
+        Embedding[Transform chunks into document embedding]
+    end  
+end  
+
+subgraph LLMApi[LLM Service]
+    LLMService[OpenAI]
+end
+
+ subgraph Pinecone[Pinecone]
+  VectorStore[Vector Store]
+ end  
+
+subgraph PersistenceLayer[Google Cloud Firebase]
+    Database[(Firestore Database)]
+end  
+
+ClientView --> Chatbot
+Chatbot --> |Look for question cached on Redis| Redis
+Redis --> |Return the answer from Redis if found it based on question similarity| Chatbot
+Redis --> |If do not have cache perform a search similarity| VectorStore
+VectorStore --> |If above a threshold return the vector itself| Chatbot
+VectorStore --> |If below threshold send question altogether with top K documents retrieved as context to LLM| LLMService
+LLMService --> |Return the RAG answer| Chatbot
+LLMService --> |Store LLM usage metadata and user chat history| Database
+LLMService --> |Update the cache| Redis
+
+Firecrawl --> Chunking
+Chunking --> Embedding
+Embedding --> |Uses OpenAI embedding model to turn text into vectors| LLMService
+Embedding --> |Upload the embeddings to the vector store| VectorStore
+Chatbot --> |Return the answer| ClientView

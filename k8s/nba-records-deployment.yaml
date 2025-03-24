@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nba-records-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nba-records
+  template:
+    metadata:
+      labels:
+        app: nba-records
+    spec:
+      containers:
+        - name: nba-records
+          image: evilmaax/nba-records:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nba-records-secrets
+                  key: OPENAI_API_KEY
+            - name: PINECONE_ENV
+              value: "us-east-1"
+            - name: PINECONE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nba-records-secrets
+                  key: PINECONE_API_KEY
+            - name: FIRECRAWL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nba-records-secrets
+                  key: FIRECRAWL_API_KEY
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
+

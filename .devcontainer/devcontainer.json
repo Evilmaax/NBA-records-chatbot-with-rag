@@ -1,0 +1,19 @@
+{
+    "name": "Python 3.10",
+    "image": "mcr.microsoft.com/devcontainers/python:1-3.10-bullseye",
+    "remoteUser": "root",
+    "features": {
+        "ghcr.io/devcontainers-contrib/features/poetry:2": {
+            "version": "2.0.0"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
+    },
+    "runArgs": [
+        "--mount=type=bind,source=c://YOUR_USER_PATH/.kube,target=/root/.kube",
+        "--add-host=host.docker.internal:host-gateway"
+    ],
+    "containerEnv": {
+        "KUBECONFIG": "/root/.kube/config"
+    }
+}

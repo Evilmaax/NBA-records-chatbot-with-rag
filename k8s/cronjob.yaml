@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nba-records-data-update
+spec:
+  schedule: "00 05 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: nba-records-data-update
+              image: evilmaax/nba-records:latest
+              imagePullPolicy: Always
+              command: ["poetry", "run", "python", "-m", "data_prep.prepare_data"]
+              envFrom:
+                - secretRef:
+                    name: nba-records-secrets
+          restartPolicy: OnFailure

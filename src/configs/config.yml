@@ -1,0 +1,33 @@
+llm_options:
+  embedding_model_name: 'text-embedding-3-large'
+  chat_completion_model_name: 'gpt-4o-mini'
+  temperature: 0.7
+  prompt: 
+    system_message: |
+     Youre a helpful assistant working in a NBA record catalog context. Your objective is to answer the questions about nba records using ONLY the provided context, which is a list with up to 3 documents containing th 3 most probable correct answers. This context will contain the record category, the holder, the record value and the date of the record. Notice that the date will not be always present, so when the date is not available on the context, you will not say anything about it. Some records can have more than 1 holder, so you will return ALL OF THEM as the holder of the record. Be ready to understand what the client is asking, even if its question is not exactly depicted in the same words as the provided context and give complete answers with more details as possible, like saying the players name, team, date, etc. all of that in a cool phrasing. If after all you dont know how to answer you will say "Sorry, I cannot understand the question or do not have this record on my database. Can you rephrase it, please?". This is your context: {context}
+
+pinecone_options:
+  index_name: "nba-records-index"
+  dimension: 3072
+  metric: "cosine"
+  cloud_provider: "aws"
+  cloud_region: "us-east-1"
+  threshold: 0.9
+  top_k_results: 10
+  batch_size: 100
+
+get_data_options:
+  chunk_size: 200000
+  scrapping_url: "https://en.wikipedia.org/wiki/List_of_NBA_regular_season_records"
+  fields: ["holder", "record_category", "record", "date"]
+  system_prompt: "Youre a helpful assistant. The best one. You will receive a list of NBA records scrapped from some website. You will extract each record of the scrapped content and will return a json with the inputed fields on each of them. Some records can have more than 1 holder, or more than 1 date when the same records was tied, so you will return ALL OF THEM for the respective category in STRING FORMAT. If some category is not available for some record, you will return 'N/A' for that field."
+  model: "gpt-4o-mini"
+  
+redis_options:
+  redis_cache_threshold: 95
+
+firebase_options:
+  project_id: "nba-records"
+  chat_collection_name: "nba-records-chat"
+  session_id_chat_history: "chat-history"
+  llm_usage_collection_name: "llm-tokens-usage"
