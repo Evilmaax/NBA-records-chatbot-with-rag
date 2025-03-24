@@ -39,7 +39,12 @@ And that is it. All of that running smoothly on a Kubernetes cluster with the ce
 
 ## Get Started
 
-To run the project it is pretty simple: First of all, clone the repo and fill the gaps regarding to the APIs keys. You gonna need an OpenAI, Pinecone and Firecrawl keys (links to generate them are on the `.env` file) and put the `firebase-keys.json` on the `configs` fodelder.
+To run the project it is pretty simple: First of all, clone the repo and fill the gaps regarding to the APIs keys (links to generate them are on the `.env` file). Set them at: 
+
+* The `.env` file to run locally; and
+* The `secrets.yaml` file hashed to 64b (at the `k8s`folder) to run it on Kubernetes.
+
+You gonna need an OpenAI, Pinecone and Firecrawl keys. You're will also need to put the `firebase-keys.json` on the `configs` folder (instructions to do that are on the placeholder file as well).
 
 After that, make sure you have a Kubernetes cluster running on your machine. If you dont have one yet, the easiest way to set one is with the integrated [`Kubernetes cluster on Docker Desktop`](https://docs.docker.com/desktop/features/kubernetes/).
 
